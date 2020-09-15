@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 {-# LANGUAGE OverloadedStrings #-}
-import           Data.Monoid (mappend)
+import           Data.Monoid                    ( mappend )
 import           Hakyll
 
 
@@ -8,36 +8,37 @@ import           Hakyll
 main :: IO ()
 main = hakyll $ do
     match "images/*" $ do
-        route   idRoute
+        route idRoute
         compile copyFileCompiler
 
     match "css/*" $ do
-        route   idRoute
+        route idRoute
         compile compressCssCompiler
 
     match "posts/*" $ do
-        route   $ setExtension "html"
+        route $ setExtension "html"
         compile $ do
-            let pageCtx =
-                    field "recent_posts" (\_ -> recentPostList) `mappend`
-                    postCtx
+            let
+                pageCtx =
+                    field "recent_posts" (\_ -> recentPostList)
+                        `mappend` postCtx
 
             pandocCompiler
-              >>= loadAndApplyTemplate "templates/post.html"    postCtx
-              >>= loadAndApplyTemplate "templates/default.html" pageCtx
-              >>= relativizeUrls
+                >>= loadAndApplyTemplate "templates/post.html"    postCtx
+                >>= loadAndApplyTemplate "templates/default.html" pageCtx
+                >>= relativizeUrls
 
     match (fromList ["about.md", "contact.md"]) $ do
-        route   $ setExtension "html"
+        route $ setExtension "html"
         compile $ do
             let pagesCtx =
-                    field "recent_posts" (\_ -> recentPostList) `mappend`
-                    constField "title" "Blog Title"            `mappend`
-                    constField "site_desc" siteDesc          `mappend`
-                    defaultContext
+                    field "recent_posts" (\_ -> recentPostList)
+                        `mappend` constField "title"     "Blog Title"
+                        `mappend` constField "site_desc" siteDesc
+                        `mappend` defaultContext
 
             pandocCompiler
-                >>= loadAndApplyTemplate "templates/page.html" defaultContext
+                >>= loadAndApplyTemplate "templates/page.html"    defaultContext
                 >>= loadAndApplyTemplate "templates/default.html" pagesCtx
                 >>= relativizeUrls
 
@@ -46,11 +47,11 @@ main = hakyll $ do
         compile $ do
             posts <- recentFirst =<< loadAll "posts/*"
             let archiveCtx =
-                    listField "posts" postCtx (return posts) `mappend`
-                    field "recent_posts" (\_ -> recentPostList) `mappend`
-                    constField "title" "Archives"            `mappend`
-                    constField "site_desc" siteDesc          `mappend`
-                    defaultContext
+                    listField "posts" postCtx (return posts)
+                        `mappend` field "recent_posts" (\_ -> recentPostList)
+                        `mappend` constField "title"     "Archives"
+                        `mappend` constField "site_desc" siteDesc
+                        `mappend` defaultContext
 
             makeItem ""
                 >>= loadAndApplyTemplate "templates/archive.html" archiveCtx
@@ -63,11 +64,11 @@ main = hakyll $ do
         compile $ do
             posts <- recentFirst =<< loadAll "posts/*"
             let indexCtx =
-                    field "recent_posts" (\_ -> recentPostList) `mappend`
-                    listField "posts" postCtx (return posts) `mappend`
-                    constField "title" "Blog Title"         `mappend`
-                    constField "site_desc" siteDesc          `mappend`
-                    defaultContext
+                    field "recent_posts" (\_ -> recentPostList)
+                        `mappend` listField "posts" postCtx (return posts)
+                        `mappend` constField "title"     "Blog Title"
+                        `mappend` constField "site_desc" siteDesc
+                        `mappend` defaultContext
 
             getResourceBody
                 >>= applyAsTemplate indexCtx
@@ -81,9 +82,9 @@ main = hakyll $ do
 -- Metadata
 postCtx :: Context String
 postCtx =
-    dateField "date" "%B %e, %Y" `mappend`
-    constField "site_desc" siteDesc `mappend`
-    defaultContext
+    dateField "date" "%B %e, %Y"
+        `mappend` constField "site_desc" siteDesc
+        `mappend` defaultContext
 
 siteDesc :: String
 siteDesc = "Description for this blog"
@@ -93,7 +94,7 @@ siteDesc = "Description for this blog"
 recentPosts :: Compiler [Item String]
 recentPosts = do
     identifiers <- getMatches "posts/*"
-    return [Item identifier "" | identifier <- identifiers]
+    return [ Item identifier "" | identifier <- identifiers ]
 
 recentPostList :: Compiler String
 recentPostList = do
